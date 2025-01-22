@@ -25,27 +25,30 @@ class Theme
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var Collection<int, ThemeCategory>
+     */
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: ThemeCategory::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $themeCategories;
 
     /**
-     * @var ArrayCollection
+     * @var Collection<int, UserGroup>
      */
-    private $categories;
-
-    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'systemThemes')]
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'systemThemes')]
     private Collection $systemGroups;
 
-    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'reportThemes')]
+    /**
+     * @var Collection<int, UserGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'reportThemes')]
     private Collection $reportGroups;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Versioned]
     private ?string $name = null;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
         $this->themeCategories = new ArrayCollection();
         $this->systemGroups = new ArrayCollection();
         $this->reportGroups = new ArrayCollection();
@@ -93,6 +96,10 @@ class Theme
 
     /**
      * Virtual.
+     *
+     * @return array<Category>
+     *
+     * @throws \Exception
      */
     public function getOrderedCategories(): array
     {
@@ -104,6 +111,7 @@ class Theme
             return (int) $first->getSortOrder() < (int) $second->getSortOrder() ? 1 : -1;
         });
 
+        /** @var ThemeCategory $item */
         foreach ($iterator as $i => $item) {
             $list[] = $item->getCategory();
         }
@@ -112,14 +120,14 @@ class Theme
     }
 
     /**
-     * @return Collection<int, Group>
+     * @return Collection<int, UserGroup>
      */
     public function getSystemGroups(): Collection
     {
         return $this->systemGroups;
     }
 
-    public function addSystemGroup(Group $systemGroup): self
+    public function addSystemGroup(UserGroup $systemGroup): self
     {
         if (!$this->systemGroups->contains($systemGroup)) {
             $this->systemGroups->add($systemGroup);
@@ -129,7 +137,7 @@ class Theme
         return $this;
     }
 
-    public function removeSystemGroup(Group $systemGroup): self
+    public function removeSystemGroup(UserGroup $systemGroup): self
     {
         if ($this->systemGroups->removeElement($systemGroup)) {
             $systemGroup->removeSystemTheme($this);
@@ -139,14 +147,14 @@ class Theme
     }
 
     /**
-     * @return Collection<int, Group>
+     * @return Collection<int, UserGroup>
      */
     public function getReportGroups(): Collection
     {
         return $this->reportGroups;
     }
 
-    public function addReportGroup(Group $reportGroup): self
+    public function addReportGroup(UserGroup $reportGroup): self
     {
         if (!$this->reportGroups->contains($reportGroup)) {
             $this->reportGroups->add($reportGroup);
@@ -156,7 +164,7 @@ class Theme
         return $this;
     }
 
-    public function removeReportGroup(Group $reportGroup): self
+    public function removeReportGroup(UserGroup $reportGroup): self
     {
         if ($this->reportGroups->removeElement($reportGroup)) {
             $reportGroup->removeSystemTheme($this);

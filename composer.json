@@ -4,10 +4,9 @@
     "license": "proprietary",
     "type": "project",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/annotations": "^2.0",
         "doctrine/dbal": "^3.6",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
@@ -18,18 +17,27 @@
         "knplabs/knp-paginator-bundle": "^6.1",
         "phpoffice/phpspreadsheet": "^1.28",
         "stof/doctrine-extensions-bundle": "^1.7",
+        "symfony/asset": "6.4.*",
+        "symfony/asset-mapper": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.4.*",
         "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.4.*",
+        "symfony/twig-bundle": "6.4.*",
         "symfony/validator": "6.4.*",
-        "symfony/yaml": "6.4.*"
+        "symfony/yaml": "6.4.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.43",
         "friendsofphp/php-cs-fixer": "^3.66",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.48",
         "symfony/phpunit-bridge": "*",
         "symfony/stopwatch": "6.4.*",
@@ -63,6 +71,7 @@
         "allow-plugins": {
             "ergebnis/composer-normalize": true,
             "php-http/discovery": true,
+            "phpstan/extension-installer": true,
             "symfony/flex": true,
             "symfony/runtime": true
         },
@@ -83,7 +92,21 @@
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
+        },
+        "coding-standards-apply": [
+            "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix"
+        ],
+        "coding-standards-check": [
+            "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --dry-run"
+        ],
+        "coding-standards-analysis": [
+            "./vendor/bin/phpstan analyse src migrations"
+        ],
+        "coding-standards-baseline": [
+            "./vendor/bin/phpstan analyse src migrations --generate-baseline"
+        ]
+
     }
 }

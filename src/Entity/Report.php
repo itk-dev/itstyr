@@ -23,13 +23,16 @@ class Report
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $id = null;
 
+    /**
+     * @var Collection<int, Answer>
+     */
     #[ORM\OneToMany(mappedBy: 'report', targetEntity: Answer::class)]
     private Collection $answers;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Versioned]
     private ?string $name = null;
 
@@ -37,7 +40,7 @@ class Report
     #[Versioned]
     private ?string $text = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Versioned]
     private ?string $sysSystemOwner = null;
 
@@ -134,7 +137,7 @@ class Report
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $sysInternalInformation = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $sysLink = null;
 
     #[ORM\Column(nullable: true)]
@@ -155,10 +158,13 @@ class Report
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $sysImpactAnalysisLink = null;
 
-    #[ORM\Column(length: 255, nullable: true, name: 'edoc_url')]
+    #[ORM\Column(name: 'edoc_url', length: 255, nullable: true)]
     private ?string $eDocUrl = null;
 
-    #[ORM\ManyToMany(targetEntity: Group::class, inversedBy: 'reports')]
+    /**
+     * @var Collection<int, UserGroup>
+     */
+    #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'reports')]
     private Collection $groups;
 
     public function __construct()
@@ -222,7 +228,7 @@ class Report
     /**
      * Virtual property.
      */
-    public function getTextSet()
+    public function getTextSet(): bool
     {
         return isset($this->text);
     }
@@ -602,9 +608,9 @@ class Report
     /**
      * Virtual property.
      */
-    public function getShowableName()
+    public function getShowableName(): ?string
     {
-        return isset($this->sysTitle) ? $this->sysTitle : $this->getName();
+        return $this->sysTitle ?? $this->getName();
     }
 
     public function getSysOwnerSub(): ?string
@@ -621,8 +627,10 @@ class Report
 
     /**
      * Virtual property.
+     *
+     * @return array<Theme>
      */
-    public function getAnswerArea()
+    public function getAnswerArea(): array
     {
         $themes = [];
         $groups = $this->getGroups();
@@ -743,14 +751,14 @@ class Report
     }
 
     /**
-     * @return Collection<int, Group>
+     * @return Collection<int, UserGroup>
      */
     public function getGroups(): Collection
     {
         return $this->groups;
     }
 
-    public function addGroup(Group $group): self
+    public function addGroup(UserGroup $group): self
     {
         if (!$this->groups->contains($group)) {
             $this->groups->add($group);
@@ -759,7 +767,7 @@ class Report
         return $this;
     }
 
-    public function removeGroup(Group $group): self
+    public function removeGroup(UserGroup $group): self
     {
         $this->groups->removeElement($group);
 
